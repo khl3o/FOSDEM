@@ -21,7 +21,7 @@ class Settings extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      xmlURL: '',
+      xmlURL: 'https://',
       eventCount: 0,
       showSpinner: false,
     };
@@ -30,15 +30,17 @@ class Settings extends React.Component {
   componentDidMount = async () => {
     // const postSettingsOutput = await postSettings('schedule_xml', 'https://fosdem.org/2020/schedule/xml');
     console.log('schedule_xml_url');
-    let xmlUrl = await getSettings('schedule_xml_url');
+    let xmlURL = await getSettings('schedule_xml_url');
     let events = await getEvents();
-console.log(xmlUrl);
-    if (!xmlUrl) {
-      xmlUrl = 'https://fosdem.org/2020/schedule/xml';
-    }
 
+    console.log('xmlURL', xmlURL);
+
+    if (!xmlURL) {
+      xmlURL = 'https://fosdem.org/2020/schedule/xml';
+    }
+    console.log('xmlURL', xmlURL);
     this.setState({
-      xmlURL: xmlUrl,
+      xmlURL: xmlURL,
       eventCount: events.length,
     });
   };

@@ -1,10 +1,11 @@
 import AsyncStorage from '@react-native-community/async-storage';
 
 const getSettings = async settingKey => {
-  console.log('getSettings');
   try {
     const settingsJson = await AsyncStorage.getItem('settings');
-    console.log(settingsJson);
+    if (!settingsJson) {
+      return false;
+    }
     const settings = JSON.parse(settingsJson);
     if (settings[settingKey]) {
       return settings[settingKey];

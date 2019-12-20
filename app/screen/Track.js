@@ -10,6 +10,7 @@ import {
 import BottomMenu from './component/BottomMenu';
 import {getTrackEvents} from '../model/events';
 import Event from './component/Event';
+import {getFavourites} from '../service/event';
 
 class Track extends React.Component {
   constructor(props) {
@@ -18,13 +19,18 @@ class Track extends React.Component {
     const track = navigation.getParam('name');
     this.state = {
       track: track,
+      events: [],
+      favourites: [],
     };
   }
 
   componentDidMount = async () => {
     const events = await getTrackEvents(this.state.track);
+    const favourites = await getFavourites();
+    console.log('getFavourites', favourites);
     this.setState({
       events: events,
+      favourites: favourites,
     });
   };
 
@@ -34,14 +40,13 @@ class Track extends React.Component {
         <StatusBar barStyle="dark-content" />
         <SafeAreaView>
           <ScrollView
-            contentInsetAdjustmentBehavior="automatic"
             style={{marginTop:15, marginBottom:65}}>
-            <View style={{alignItems: 'center', textAlign:'center'}}>
-              <Text style={{textAlign: 'center', fontSize:18, fontWeight:'bold'}}>{this.state.track}</Text>
+            <View style={{alignItems: 'center', paddingLeft:10, paddingRight:10, textAlign:'center'}}>
+              <Text style={{textAlign: 'center', fontSize:28, fontWeight:'bold', lineHeight: 28, marginBottom: 35}}>{this.state.track}</Text>
               <FlatList
                 data={this.state.events}
                 keyExtractor={item => item.id}
-                renderItem={({item}) => <Event item={item} />}
+                renderItem={({item}) => <Event item={item} favourites={this.state.favourites} />}
               />
             </View>
           </ScrollView>

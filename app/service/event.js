@@ -2,6 +2,7 @@ import {fetchGet} from './fetch';
 import XMLParser from 'react-xml-parser';
 
 import {getEvents, postEvent} from '../model/events';
+import {saveAsFavourite, removeAsFavourite, getFavourites} from '../model/favourite';
 
 // TO BE MOVED IN AN "UTILS" SERVICE
 const chainPromise = (array, action) => {
@@ -66,6 +67,15 @@ const exportEventsFromXML = schedule => {
           )[0].value;
         });
 
+        // extract persons
+        const persons = event.children.filter(item => item.name === 'persons')[0].children;
+
+        eventOutput['persons'] = [];
+
+        persons.forEach(person => {
+          eventOutput['persons'].push(person.value);
+        });
+
         eventsOutput.push(eventOutput);
       });
     });
@@ -76,7 +86,6 @@ const exportEventsFromXML = schedule => {
 
 const pushEventsToAsyncStorage = async events => {
   const eventsFromAS = await getEvents();
-  console.log(eventsFromAS);
   await chainPromise(events, async event => {
     if (!checkIfExists(event, eventsFromAS)) {
       console.log('add event to async storage', event);
@@ -97,4 +106,17 @@ const checkIfExists = (event, events) => {
   return false;
 }
 
-module.exports = {downloadScheduleFromXML};
+const addEventAsFavourite = event => {
+  saveAsFavourite(event);
+};
+
+const removeEventAsFavourite = event => {
+  removeAsFavourite(event);
+};
+
+module.exports = {
+  downloadScheduleFromXML,
+  addEventAsFavourite,
+  getFavourites,
+  removeEventAsFavourite,
+};

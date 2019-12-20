@@ -3,10 +3,13 @@ import AsyncStorage from '@react-native-community/async-storage';
 const getEvents = async () => {
   try {
     const eventsJson = await AsyncStorage.getItem('events');
-    return JSON.parse(eventsJson);
+    if (eventsJson) {
+      return JSON.parse(eventsJson);
+    }
+    return [];
   } catch (e) {
     console.log('getSettings::ERROR::', e);
-    return false;
+    return [];
   }
 };
 
