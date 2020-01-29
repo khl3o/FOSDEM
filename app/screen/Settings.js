@@ -7,6 +7,7 @@ import {
   Button,
   TextInput,
   ActivityIndicator,
+  StyleSheet,
 } from 'react-native';
 import BottomMenu from './component/BottomMenu';
 import {getSettings, postSettings} from '../model/settings';
@@ -16,6 +17,7 @@ import {downloadScheduleFromXML} from '../service/event';
 class Settings extends React.Component {
   static navigationOptions = {
     title: 'Settings',
+    headerLeft: null,
   };
 
   constructor(props) {
@@ -28,17 +30,11 @@ class Settings extends React.Component {
   }
 
   componentDidMount = async () => {
-    // const postSettingsOutput = await postSettings('schedule_xml', 'https://fosdem.org/2020/schedule/xml');
-    console.log('schedule_xml_url');
     let xmlURL = await getSettings('schedule_xml_url');
     let events = await getEvents();
-
-    console.log('xmlURL', xmlURL);
-
     if (!xmlURL) {
       xmlURL = 'https://fosdem.org/2020/schedule/xml';
     }
-    console.log('xmlURL', xmlURL);
     this.setState({
       xmlURL: xmlURL,
       eventCount: events.length,
@@ -82,35 +78,36 @@ class Settings extends React.Component {
       <>
         <SafeAreaView>
           <ScrollView contentInsetAdjustmentBehavior="automatic">
-            <View style={{padding:25, paddingBottom:0}}>
-              <Text>FOSDEM XML Schedule URL</Text>
+            <View style={styles.inputForm}>
+              <Text>FOSDEM Pentabarf XML URL</Text>
               <TextInput
-                style={{ height: 40, borderColor: 'gray', fontSize:16, padding: 5, borderWidth: 1 }}
+                style={styles.xmlInputField}
                 onChangeText={text => this.onChangeText(text)}
                 value={this.state.xmlURL}
               />
             </View>
-            <View style={{paddingTop:10, alignItems: 'center'}}>
-              <Text>last sync: xxx</Text>
-              <Text>{ this.state.eventCount } events found</Text>
+            <View style={styles.eventCountView}>
+              <Text style={styles.eventCountText}>
+                {this.state.eventCount} events found
+              </Text>
             </View>
             {this.state.spinner ? (
               <ActivityIndicator size="large" />
             ) : (
               <View>
-                <View style={{paddingTop:10, alignItems: 'center'}}>
+                <View style={styles.refreshButtonContainer}>
                   <Button
                     title="REFRESH"
                     onPress={() => {this.refreshXml()}}
                   />
                 </View>
-                <View style={{paddingTop:50, alignItems: 'center'}}>
+                <View style={styles.cleanEventsContainer}>
                   <Button
-                    title="CLEAN"
+                    title="CLEAN EVENTS"
                     onPress={() => {this.cleanEvents()}}
                   />
-                  <View style={{alignItems: 'center'}}>
-                    <Text>clean local storage (events + favourites)</Text>
+                  <View style={styles.cleanDetails}>
+                    <Text>clean events from local storage</Text>
                   </View>
                 </View>
               </View>
@@ -122,5 +119,38 @@ class Settings extends React.Component {
     );
   }
 };
+
+const styles = StyleSheet.create({
+  inputForm: {
+    padding: 25,
+    paddingBottom: 0,
+  },
+  xmlInputField: {
+    height: 40,
+    borderColor: 'gray',
+    color: '#000',
+    fontSize: 16,
+    padding: 5,
+    borderWidth: 1,
+  },
+  eventCountView: {
+    paddingTop: 15,
+    alignItems: 'center',
+  },
+  eventCountText: {
+    fontSize: 18,
+  },
+  refreshButtonContainer: {
+    paddingTop: 10,
+    alignItems: 'center',
+  },
+  cleanEventsContainer: {
+    paddingTop: 50,
+    alignItems: 'center',
+  },
+  cleanDetails: {
+    alignItems: 'center',
+  },
+});
 
 export default Settings;

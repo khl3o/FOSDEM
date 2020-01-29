@@ -5,6 +5,7 @@ import Track from './screen/Track';
 import Event from './screen/Event';
 import Favourites from './screen/Favourites';
 import Settings from './screen/Settings';
+import Room from './screen/Room';
 
 const MainNavigator = createStackNavigator({
   Tracks: {screen: Tracks},
@@ -12,6 +13,7 @@ const MainNavigator = createStackNavigator({
   Event: {screen: Event},
   Favourites: {screen: Favourites},
   Settings: {screen: Settings},
+  Room: {screen: Room},
 });
 
 const App = createAppContainer(MainNavigator);
