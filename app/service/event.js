@@ -40,9 +40,11 @@ const exportEventsFromXML = schedule => {
     'room',
     'slug',
     'title',
+    'subtitle',
     'track',
     'type',
     'description',
+    'abstract',
   ];
 
   const days = schedule.children.filter(item => item.name === 'day');
@@ -88,10 +90,7 @@ const pushEventsToAsyncStorage = async events => {
   const eventsFromAS = await getEvents();
   await chainPromise(events, async event => {
     if (!checkIfExists(event, eventsFromAS)) {
-      console.log('add event to async storage', event);
       await postEvent(event.id, event);
-    } else {
-      console.log('already exists');
     }
   });
 };
@@ -104,7 +103,7 @@ const checkIfExists = (event, events) => {
     return true;
   }
   return false;
-}
+};
 
 const addEventAsFavourite = event => {
   saveAsFavourite(event);

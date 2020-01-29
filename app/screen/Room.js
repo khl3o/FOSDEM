@@ -2,35 +2,34 @@ import React from 'react';
 import {
   ScrollView,
   View,
-  Text,
   FlatList,
+  Text,
   StyleSheet,
 } from 'react-native';
 import BottomMenu from './component/BottomMenu';
-import {getTrackEvents} from '../model/events';
+import {getRoomEvents} from '../model/events';
 import Event from './component/Event';
+import Map from './component/Map';
 import {getFavourites} from '../service/event';
 
-class Track extends React.Component {
+class Room extends React.Component {
+  static navigationOptions = ({ navigation, navigationOptions, props }) => {
+    return {
+      title: navigation.getParam('room'),
+    };
+  };
+
   constructor(props) {
     super(props);
-    const {navigation} = props;
-    const track = navigation.getParam('name');
     this.state = {
-      track: track,
       events: [],
       favourites: [],
     };
   }
 
-  static navigationOptions = ({navigation}) => {
-    return {
-      title: navigation.getParam('name'),
-    };
-  };
-
   componentDidMount = async () => {
-    const events = await getTrackEvents(this.state.track);
+    const roomName = this.props.navigation.getParam('room');
+    const events = await getRoomEvents(roomName);
     const favourites = await getFavourites();
     this.setState({
       events: events,
@@ -42,8 +41,13 @@ class Track extends React.Component {
     return (
       <>
         <ScrollView style={styles.scrollView}>
-          <View style={styles.container}>
-            <Text style={styles.title}>{this.state.track}</Text>
+          <Text style={styles.roomName}>
+            {this.props.navigation.getParam('room')}
+          </Text>
+          <View style={styles.map}>
+            <Map room={this.props.navigation.getParam('room')} />
+          </View>
+          <View style={styles.list}>
             <FlatList
               data={this.state.events}
               keyExtractor={item => item.id}
@@ -62,19 +66,22 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginBottom: 65,
   },
-  container: {
-    alignItems: 'center',
-    paddingLeft:10,
-    paddingRight:10,
-    textAlign:'center'
-  },
-  title: {
+  roomName: {
     textAlign: 'center',
-    fontSize:28,
-    fontWeight:'bold',
+    fontSize: 28,
+    fontWeight: 'bold',
     lineHeight: 28,
-    marginBottom: 35
+    marginBottom: 35,
+  },
+  map: {
+    marginBottom: 25,
+  },
+  list: {
+    alignItems: 'center',
+    paddingLeft: 10,
+    paddingRight: 10,
+    textAlign: 'center',
   },
 });
 
-export default Track;
+export default Room;

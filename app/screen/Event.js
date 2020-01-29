@@ -1,114 +1,134 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
-
 import React from 'react';
 import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
   View,
   Text,
-  StatusBar,
+  ScrollView,
+  StyleSheet
 } from 'react-native';
+import {XmlEntities} from 'html-entities';
+import moment from 'moment';
+import HTML from 'react-native-render-html';
+import BottomMenu from './component/BottomMenu';
+import Map from './component/Map';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+class Event extends React.Component {
+  constructor(props) {
+    super(props);
+    const {navigation} = props;
+    const event = navigation.getParam('event');
+    this.state = {
+      event: event,
+    };
+  }
 
-const App: () => React$Node = () => {
-  return (
-    <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
+  formatDuration = duration => {
+    const output = duration.split(':');
+    const hours = parseInt(output[0], 10);
+    const minutes = parseInt(output[1], 10);
+    return hours * 60 + minutes;
+  };
+
+  render() {
+    return (
+      <>
+        <ScrollView style={styles.scrollView}>
+          <Text style={styles.title}>
+            {XmlEntities.decode(this.state.event.title)}
+          </Text>
+
+          {(this.state.event.persons && this.state.event.persons.length > 0)
+            ? <Text style={styles.persons}>by { this.state.event.persons.join(', ') }</Text>
+            : <View/>}
+
           <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
+
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>
+                {moment(this.state.event.start).format('dddd')}
               </Text>
             </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
+
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>
+                {moment(this.state.event.start).format('HH:mm')}
               </Text>
             </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
+
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>
+                {this.formatDuration(this.state.event.duration)} min
               </Text>
             </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
+
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>{this.state.event.room}</Text>
             </View>
-            <LearnMoreLinks />
+
+            <View style={styles.tag}>
+              <Text style={styles.tagText}>{this.state.event.track}</Text>
+            </View>
+
           </View>
+
+          { (this.state.event.subtitle !== '')
+            ? <View style={{alignSelf: 'flex-start', fontSize:20, marginTop:10}}>
+              <HTML baseFontStyle={{fontSize: 18, fontWeight: 'bold'}} html={XmlEntities.decode(this.state.event.subtitle)} />
+            </View>
+            : <View/> }
+
+          { (this.state.event.abstract !== '')
+            ? <View style={{alignSelf: 'flex-start', fontSize:20, marginTop:10}}>
+              <HTML baseFontStyle={{fontSize: 18}} html={XmlEntities.decode(this.state.event.abstract)} />
+            </View>
+            : <View/> }
+
+          { (this.state.event.description !== '')
+            ? <View style={{alignSelf: 'flex-start', fontSize:18, marginTop:10}}>
+              <HTML baseFontStyle={{fontSize: 18}} html={XmlEntities.decode(this.state.event.description)} />
+            </View>
+            : <View/> }
+
+          <Map room={this.state.event.room} />
         </ScrollView>
-      </SafeAreaView>
-    </>
-  );
+        <BottomMenu navigation={this.props.navigation} />
+      </>
+    );
+  }
 };
 
 const styles = StyleSheet.create({
   scrollView: {
-    backgroundColor: Colors.lighter,
+    margin: 15,
+    marginBottom: 65,
   },
-  engine: {
-    position: 'absolute',
-    right: 0,
+  title: {
+    fontSize: 24,
+    color: '#333',
+    lineHeight: 26,
+    marginBottom: 5,
+    fontWeight: 'bold',
+  },
+  persons: {
+    fontSize: 16,
+    color: '#333',
   },
   body: {
-    backgroundColor: Colors.white,
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    width: '100%',
+    marginTop: 10,
   },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  tag: {
+    backgroundColor: '#CCC',
+    borderRadius: 5,
+    margin: 5,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
+  tagText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#000',
+    padding: 5,
   },
 });
 
-export default App;
+export default Event;
