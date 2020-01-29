@@ -4,6 +4,7 @@ import {
   View,
   FlatList,
   StyleSheet,
+  Text,
 } from 'react-native';
 import BottomMenu from './component/BottomMenu';
 import {getEventsMarkedAsFavourite} from '../model/events';
@@ -38,11 +39,13 @@ class Favourites extends React.Component {
       <>
         <ScrollView style={styles.scrollView}>
           <View style={styles.body}>
-            <FlatList
-              data={this.state.events}
-              keyExtractor={item => item.id}
-              renderItem={({item}) => <Event item={item} navigation={this.props.navigation} favourites={this.state.favourites} />}
-            />
+            { this.state.events.length > 0 ?
+              <FlatList
+                data={this.state.events}
+                keyExtractor={item => item.id}
+                renderItem={({item}) => <Event item={item} navigation={this.props.navigation} favourites={this.state.favourites} />}
+              /> : <Text>No event marked as favourite</Text>
+            }
           </View>
         </ScrollView>
         <BottomMenu navigation={this.props.navigation} />
